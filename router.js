@@ -1,11 +1,13 @@
 const Profile = require('./profile.js');
+const renderer = require('./renderer.js')
 
 function home(request, response) {
   if (request.url === '/') {
     response.writeHead(200, { 'Content-Type': 'text/plain' });
-    response.write('Header \n');
-    response.write('Search \n');
-    response.end('Footer \n');
+    renderer.view("header",{},response);
+    renderer.view("search",{},response);
+    renderer.view("footer",{},response);
+    response.end();
   }
 }
 
@@ -13,7 +15,8 @@ function user(request, response) {
   const username = request.url.replace('/', '');
   if (username.length > 0) {
     response.writeHead(200, { 'Content-Type': 'text/plain' });
-    response.write('Header \n');
+    renderer.view("header",{},response);
+    
     // get Json
     const studentProfile = new Profile(username);
 
@@ -34,20 +37,19 @@ function user(request, response) {
         javascriptPoints: profileJSON.points.JavaScript
       };
       //response;
-      response.write(
-        `${values.username} has ${values.badges} badges and ${
-          values.javascriptPoints
-        } javascript points \n`
-      );
-      response.end('Footer \n');
+    renderer.view('profile',values,response);
+    renderer.view('footer',{},response);
+    response.end();
     });
     /**On error;
      * If a parsing, network or HTTP error occurs an
      * error object is passed in to the handler or callback
      **/
     studentProfile.on('error', e => {
-      response.write(e.message + '\n');
-      response.end('Footer \n');
+    renderer.view('error',{errorMessage:e.message},response);
+    renderer.view("search",{},response);
+    renderer.view('footer',{},response);
+    response.end();
     });
   }
 }
