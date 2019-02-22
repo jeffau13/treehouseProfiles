@@ -46,11 +46,31 @@ function user(request, response) {
       //show profile
 
       //store what we need
+      
+      //find newest badge:
+    const mostRecentDate = new Date(Math.max.apply(null, profileJSON.badges.map( e => {
+        return new Date(e.earned_date);
+     })));
+    const mostRecentBadge = profileJSON.badges.filter( e => { 
+         const d = new Date( e.earned_date ); 
+         return d.getTime() == mostRecentDate.getTime();
+     })[0];
+     let badgeMonth = parseInt(mostRecentDate.getMonth()) +1;
+     badgeMonth = badgeMonth.toString();
+     const badgeDate = mostRecentDate.getFullYear() + '/'+ badgeMonth +'/'+
+     mostRecentDate.getDate();
+
+
+
       const values = {
         avatarUrl: profileJSON.gravatar_url,
         username: profileJSON.profile_name,
         badges: profileJSON.badges.length,
-        javascriptPoints: profileJSON.points.JavaScript
+        javascriptPoints: profileJSON.points.JavaScript,
+        recentbadge: mostRecentBadge.name,
+        iconUrl:mostRecentBadge.icon_url,
+        badgeDate:badgeDate
+        
       };
       //response;
     renderer.view('profile',values,response);
